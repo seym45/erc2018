@@ -1,0 +1,7 @@
+{
+    "port": "COM23",
+    "board": "arduino:avr:mega",
+    "configuration": "cpu=atmega2560",
+    "sketch": "manoeuvre.ino",
+    "output": "../ArduinoOutput"
+}

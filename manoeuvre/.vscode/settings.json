@@ -1,0 +1,11 @@
+{
+    "arduino.path":"F:\\soft\\robotics\\arduino-1.8.1",
+    
+    "arduino.logLevel": "info",
+    "arduino.enableUSBDetection": true,
+    "arduino.disableTestingOpen": false,
+    "arduino.skipHeaderProvider": false,
+    "arduino.additionalUrls": [
+    ],
+    "defaultBaudRate": 115200
+}
