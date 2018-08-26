@@ -68,6 +68,7 @@ String arm_names[] = {
     "Wrst",
     "Grab",
 };
+
 int channel[7] = {
     //channel name index
     7, // base  0

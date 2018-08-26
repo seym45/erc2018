@@ -6,7 +6,6 @@
 #define BRAKE 3
 #define RELEASE 4
 
-
 class IBT
 {
   public:
