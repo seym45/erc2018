@@ -18,15 +18,15 @@ bool near(double from, double to, int tolerance)
 }
 
 
-void sonar_test()
-{
-  Serial.print("Act 1: ");
-  Serial.print(sonar_act1.get_distance());  
-  Serial.print('\t');
-  Serial.print("Act 2: ");
-  Serial.print(sonar_act2.get_distance());  
-  Serial.println();
-}
+// void sonar_test()
+// {
+//   Serial.print("Act 1: ");
+//   Serial.print(sonar_act1.get_distance());  
+//   Serial.print('\t');
+//   Serial.print("Act 2: ");
+//   Serial.print(sonar_act2.get_distance());  
+//   Serial.println();
+// }
 
 
 double rad2deg(double rad)

@@ -1,69 +1,98 @@
-bool able2move(int arm_name)
+void setup_relays()
 {
-  bool ans = false;
+  pinMode(RELAY_12V_CH1, OUTPUT);
+  pinMode(RELAY_12V_CH2, OUTPUT);
+  pinMode(RELAY_12V_CH3, OUTPUT);
+  pinMode(RELAY_12V_CH4, OUTPUT);
+
+  pinMode(RELAY_24V_CH1, OUTPUT);
+  pinMode(RELAY_24V_CH2, OUTPUT);
+  pinMode(RELAY_24V_CH3, OUTPUT);
+  pinMode(RELAY_24V_CH4, OUTPUT);
+
+digitalWrite(RELAY_12V_CH1,1);
+digitalWrite(RELAY_12V_CH2,1);
+digitalWrite(RELAY_12V_CH3,1);
+digitalWrite(RELAY_12V_CH4,1);
+
+
+digitalWrite(RELAY_24V_CH1,1);
+digitalWrite(RELAY_24V_CH2,1);
+digitalWrite(RELAY_24V_CH3,1);
+digitalWrite(RELAY_24V_CH4,1);
+}
+
+
+
+
+
+
+void select_motor(int arm_name)
+{
   switch (arm_name)
   {
-    case BASE:
-      ans = true;
-      break;
     case ACT1:
-      ans = true;
-      break;
-    case ACT2:
-      ans = true;
-      break;
-    case ROLL:
-      ans = true;
-      break;
-    case PITCH:
-      ans = true;
+      digitalWrite(RELAY_12V_CH1, 1);
+      digitalWrite(RELAY_12V_CH2, 1);
       break;
     case WRIST:
-      ans = true;
+      digitalWrite(RELAY_12V_CH1, 0);
+      digitalWrite(RELAY_12V_CH2, 0);
+      break;
+    case ROLL:
+      digitalWrite(RELAY_24V_CH1, 1);
+      digitalWrite(RELAY_24V_CH2, 1);
+      digitalWrite(RELAY_24V_CH3, 0);
+      digitalWrite(RELAY_24V_CH4, 1);
+      break;
+    case PITCH:
+      digitalWrite(RELAY_24V_CH1, 0);
+      digitalWrite(RELAY_24V_CH2, 0);
+      digitalWrite(RELAY_24V_CH3, 0);
+      digitalWrite(RELAY_24V_CH4, 1);
       break;
     case GRABBER:
-      ans = true;
+      digitalWrite(RELAY_24V_CH1, 1);
+      digitalWrite(RELAY_24V_CH2, 0);
+      digitalWrite(RELAY_24V_CH3, 1);
+      digitalWrite(RELAY_24V_CH4, 1);
       break;
   }
-
-  return ans;
 }
 
 void move_it(int name, int pwm)
 {
-#ifdef ARM_DEBUG
-  Serial.print("name ");
-  Serial.print(name);
-  Serial.print('\t');
-  Serial.print("pwm ");
-  Serial.print(pwm);
-  Serial.println();
-#endif
   switch (name)
   {
     case BASE:
       move_arm(base, pwm);
       break;
     case ACT1:
-      move_arm(act1, pwm);
+      if(pwm)select_motor(ACT1);
+      move_arm(act1wrist360, pwm);
       break;
     case ACT2:
       move_arm(act2, pwm);
       break;
     case ROLL:
-      move_arm(roll, pwm);
+      if(pwm)select_motor(ROLL);
+      move_arm(rpg, pwm);
       break;
     case PITCH:
-      move_arm(pitch, pwm);
+      if(pwm)select_motor(PITCH);
+      move_arm(rpg, pwm);
       break;
     case WRIST:
-      move_arm(wrist, pwm);
+      if(pwm)select_motor(WRIST);
+      move_arm(act1wrist360, pwm);
       break;
     case GRABBER:
-      move_arm(grabber, pwm);
+      if(pwm)select_motor(GRABBER);
+      move_arm(rpg, pwm);
       break;
   }
 }
+
 
 void move_arm(IBT arm, int pwm)
 {

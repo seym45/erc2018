@@ -58,24 +58,61 @@ int xyz_channel[3] = {7, 3, 2};
 // }
 
 // ---------------------------------- Fully manual control
-/////////////////ba, ac1, ac2, roll, pitc
-int channel[7] = {3, 4, 2, 1, 5, 7, 8};
+/////////////////ba, ac1, ac2, roll, pitc, w, g
+String arm_names[] = {
+    "Base",
+    "Act1",
+    "Act2",
+    "Roll",
+    "Pitc",
+    "Wrst",
+    "Grab",
+};
+int channel[7] = {
+    //channel name index
+    7, // base  0
+    2, // ac1   1
+    3, // ac2   2
+    6, // roll  3
+    5, //pitch  4
+    4, //wrist  5
+    1, //grabb  6
+};
 int available = 7;
+#define ZERO 0
 void only_rf_full()
 {
-  int raw_channel_in, raw_pwm;
-  for (byte name = 0; name < available; name++)
-  {
-    raw_channel_in = get_raw_pwm_from_rf(channel[name]);
-    raw_pwm = raw2pwm(raw_channel_in);
-    if (abs(raw_pwm) < 40)
+    int raw_channel_in, raw_pwm;
+    bool rpg_active = false;
+    bool act1wrist_active = false;
+    for (byte name = 0; name < available; name++)
     {
-      move_it(name, 0);
-      continue;
+        raw_channel_in = get_raw_input_from_rf(channel[name]);
+        raw_pwm = raw2pwm(raw_channel_in);
+        if (abs(raw_pwm) < 60)
+            raw_pwm = 0;
+
+        if (able2move(name) and (raw_pwm>0 || raw_pwm <0))
+        {
+            move_it(name, raw_pwm);
+#ifdef ARM_DEBUG
+            Serial.print(arm_names[name]);
+            Serial.print(":\t");
+            Serial.print("Speed ");
+            Serial.print(raw_pwm);
+            Serial.println();
+#endif
+        }
+        else if (name == 0 || name == 2) // base act2
+            move_it(name, 0);
+        if (!rpg_active && raw_pwm && (name == 3 || name == 4 || name == 6)) // r p g
+            rpg_active = true;
+        if (!act1wrist_active && raw_pwm  && (name == 1|| name == 5)) // r p g
+            act1wrist_active = true;
     }
-    if (able2move(name))
-      move_it(name, raw_pwm);
-    else
-      move_it(name, 0);
-  }
+
+    if (!rpg_active)
+        rpg.stop();
+    if (!act1wrist_active)
+        act1wrist360.stop();
 }
