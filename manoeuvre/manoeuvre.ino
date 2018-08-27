@@ -16,6 +16,8 @@
 #define PITCH 4
 #define WRIST 5
 #define GRABBER 6
+#define FOWARD_BACKWARD 7
+#define LEFT_RITGHT 8
 
 // 12 v realy pins
 #define RELAY_12V_CH1 31
@@ -49,7 +51,7 @@ SBUS sbus(Serial3);
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   sbus.begin(true);
   //receiver setup
   for (int i = 0; i < 8; i++)
@@ -94,13 +96,9 @@ void test()
   // delay(del);
   // rpg.rotNeg(0);
   //  armtest();
-  // only_rf_full();
-  reciever_test();
+  only_rf_full();
+  // reciever_test();
   //  display_feedbacks();
-}
-
-void display_feedbacks()
-{
 }
 
 // void armtest()

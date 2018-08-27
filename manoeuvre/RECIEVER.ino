@@ -7,33 +7,10 @@ void reciever_test()
     Serial.print("Ch");
     Serial.print(channel_id);
     Serial.print(' ');
-    Serial.print(sbus.getNormalizedChannel(channel_id));
+    Serial.print(sbus.getChannel(channel_id));
     Serial.print('\t');
   }
   Serial.println();
-  Serial.print("Failsafe: ");
-  if (sbus.getFailsafeStatus() == SBUS_FAILSAFE_ACTIVE)
-  {
-    Serial.println("Active");
-  }
-  if (sbus.getFailsafeStatus() == SBUS_FAILSAFE_INACTIVE)
-  {
-    Serial.println("Not Active");
-  }
-
-  Serial.print("Data loss on connection: ");
-  Serial.print(sbus.getFrameLoss());
-  Serial.println("%");
-
-  Serial.print("Frames: ");
-  Serial.print(sbus.getGoodFrames());
-  Serial.print(" / ");
-  Serial.print(sbus.getLostFrames());
-  Serial.print(" / ");
-  Serial.println(sbus.getDecoderErrorFrames());
-
-  Serial.print("Time diff: ");
-  Serial.println(millis() - sbus.getLastTime());
 }
 
 int temp_ch;
@@ -45,20 +22,6 @@ int get_pwm_input_from_rf(byte channel_id)
   * to get a eange of -255 to 255
   */
   return sbus.getNormalizedChannel((int)channel_id) * 2.5;
-}
-
-int temp_calc;
-int raw2pwm(int raw_channel_input)
-{
-  // i ranges from 640 to 2100 around
-  float constant = 2;
-  temp_calc = (int)((raw_channel_input - 1500) / constant);
-
-  if (temp_calc > 250)
-    temp_calc = 250;
-  if (temp_calc < -250)
-    temp_calc = -250;
-  return temp_calc;
 }
 
 // int temp_ch;
