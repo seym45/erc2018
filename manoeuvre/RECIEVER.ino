@@ -1,32 +1,51 @@
+#define NO_OF_CHANNELS 10
 
 void reciever_test()
 {
-#if DEBUG
-  for (int i = 1; i <= 8; i++)
+  for (int channel_id = 1; channel_id <= NO_OF_CHANNELS; channel_id++)
   {
-    Serial.print(ch[i-1]);
+    Serial.print("Ch");
+    Serial.print(channel_id);
     Serial.print(' ');
-    Serial.print(get_raw_input_from_rf(i));
+    Serial.print(sbus.getNormalizedChannel(channel_id));
     Serial.print('\t');
-    //    Serial.print( map( in, 1000, 2000, -255, 255));
-    //    Serial.print(' ');
   }
   Serial.println();
-#endif
-}
+  Serial.print("Failsafe: ");
+  if (sbus.getFailsafeStatus() == SBUS_FAILSAFE_ACTIVE)
+  {
+    Serial.println("Active");
+  }
+  if (sbus.getFailsafeStatus() == SBUS_FAILSAFE_INACTIVE)
+  {
+    Serial.println("Not Active");
+  }
 
+  Serial.print("Data loss on connection: ");
+  Serial.print(sbus.getFrameLoss());
+  Serial.println("%");
+
+  Serial.print("Frames: ");
+  Serial.print(sbus.getGoodFrames());
+  Serial.print(" / ");
+  Serial.print(sbus.getLostFrames());
+  Serial.print(" / ");
+  Serial.println(sbus.getDecoderErrorFrames());
+
+  Serial.print("Time diff: ");
+  Serial.println(millis() - sbus.getLastTime());
+}
 
 int temp_ch;
-int get_raw_input_from_rf(byte channel)
+int get_pwm_input_from_rf(byte channel_id)
 {
-  temp_ch = pulseIn(ch[channel-1], HIGH, 25000);
-  if (temp_ch == 0)
-  {
-    temp_ch = 1500;
-  }
-  return temp_ch;
+  /* 
+  * Method getNormalizedChannel return -100 to +100
+  * so to convert into PWM values 2.5 is multiplied 
+  * to get a eange of -255 to 255
+  */
+  return sbus.getNormalizedChannel((int)channel_id) * 2.5;
 }
-
 
 int temp_calc;
 int raw2pwm(int raw_channel_input)
@@ -35,8 +54,50 @@ int raw2pwm(int raw_channel_input)
   float constant = 2;
   temp_calc = (int)((raw_channel_input - 1500) / constant);
 
-  if (temp_calc > 250)temp_calc = 250;
-  if (temp_calc < -250)temp_calc = -250;
+  if (temp_calc > 250)
+    temp_calc = 250;
+  if (temp_calc < -250)
+    temp_calc = -250;
   return temp_calc;
 }
 
+// int temp_ch;
+// int get_raw_input_from_rf(byte channel)
+// {
+//   temp_ch = pulseIn(ch[channel - 1], HIGH, 25000);
+//   if (temp_ch == 0)
+//   {
+//     temp_ch = 1500;
+//   }
+//   return temp_ch;
+// }
+
+// int temp_calc;
+// int raw2pwm(int raw_channel_input)
+// {
+//   // i ranges from 640 to 2100 around
+//   float constant = 2;
+//   temp_calc = (int)((raw_channel_input - 1500) / constant);
+
+//   if (temp_calc > 250)
+//     temp_calc = 250;
+//   if (temp_calc < -250)
+//     temp_calc = -250;
+//   return temp_calc;
+// }
+
+// void reciever_test()
+// {
+// #if DEBUG
+//   for (int i = 1; i <= 8; i++)
+//   {
+//     Serial.print(ch[i-1]);
+//     Serial.print(' ');
+//     Serial.print(get_raw_input_from_rf(i));
+//     Serial.print('\t');
+//     //    Serial.print( map( in, 1000, 2000, -255, 255));
+//     //    Serial.print(' ');
+//   }
+//   Serial.println();
+// #endif
+// }

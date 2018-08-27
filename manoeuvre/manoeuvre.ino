@@ -1,6 +1,6 @@
 #include "IBT.h"
 #include "L298.h"
-#include "custom_libs/SBUS/SBUS.h"
+#include <SBUS.h>
 // Macro debug def
 #define ARM_DEBUG
 
@@ -45,9 +45,12 @@ int num1, num2, num3;
 // present coordinates of end effector
 int x, y, z;
 
+SBUS sbus(Serial3);
+
 void setup()
 {
   Serial.begin(9600);
+  sbus.begin(true);
   //receiver setup
   for (int i = 0; i < 8; i++)
   {
@@ -58,6 +61,11 @@ void setup()
   x = 30;
   y = 0;
   z = -50;
+}
+
+ISR(TIMER2_COMPA_vect)
+{
+  sbus.process();
 }
 
 int mode;
@@ -86,8 +94,8 @@ void test()
   // delay(del);
   // rpg.rotNeg(0);
   //  armtest();
-  only_rf_full();
-  // reciever_test();
+  // only_rf_full();
+  reciever_test();
   //  display_feedbacks();
 }
 

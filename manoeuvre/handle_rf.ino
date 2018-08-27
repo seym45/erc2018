@@ -87,8 +87,9 @@ void only_rf_full()
     bool act1wrist_active = false;
     for (byte name = 0; name < available; name++)
     {
-        raw_channel_in = get_raw_input_from_rf(channel[name]);
-        raw_pwm = raw2pwm(raw_channel_in);
+        raw_channel_in = get_pwm_input_from_rf(channel[name]);
+        // raw_pwm = raw2pwm(raw_channel_in);
+        raw_pwm = raw_channel_in;
         if (abs(raw_pwm) < 60)
             raw_pwm = 0;
 
