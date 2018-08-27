@@ -23,13 +23,21 @@ int available = 10;
 
 void only_rf_full()
 {
-  if (get_pwm_input_from_rf(flag_channel) > 50)
+  if (get_pwm_input_from_rf(RC_CHANNEL_FLAG) > 50)
+  {
     drive_wheel();
+#ifdef DEBUG
+    Serial.println("----------------------------------------------------- WHEEL")
+#endif
+  }
   else
+  {
     driver_arms();
+#ifdef DEBUG
+    Serial.println("xxxxxxxxxxxxxxxx-------------------------xxxxxxxxxxxxxxxx  ARM")
+#endif
+  }
 }
-
-
 
 void driver_arms()
 {
@@ -45,7 +53,7 @@ void driver_arms()
     if (able2move(name) and (speed > 0 || speed < 0))
     {
       move_it(name, speed);
-#ifdef ARM_DEBUG
+#ifdef DEBUG && ARM_DEBUG
       Serial.print(arm_names[name]);
       Serial.print(":\t");
       Serial.print("Speed ");
@@ -65,4 +73,64 @@ void driver_arms()
     rpg.stop();
   if (!act1wrist_active)
     act1wrist360.stop();
+}
+
+const int channel_forward_backward = 2;
+const int channel_left_right = 3;
+
+int leftspeed, rightspeed, speed, direction;
+void drive_wheel()
+{
+  speed = get_pwm_input_from_rf(channel_forward_backward);
+  direction = get_pwm_input_from_rf(channel_left_right);
+
+  if (speed and direction)
+  {
+    if (speed > 0)
+    {
+      if (direction > 0) //assume right bound
+      {
+        leftspeed = speed;
+        rightspeed = map(direction, 0, 250, 250, -250);
+        rightspeed = middle_out(rightspeed);
+      }
+      else // assumed left bound
+      {
+        leftspeed = map(direction, 0, 250, 250, -250);
+        leftspeed = middle_out(leftspeed);
+        rightspeed = speed;
+      }
+    }
+    else
+    {
+      leftspeed = speed;
+      rightspeed = speed;
+    }
+  }
+  else if (speed and !direction)
+  {
+    leftspeed = speed;
+    rightspeed = speed;
+  }
+  else if (!speed and direction)
+  {
+    leftspeed = 0;
+    rightspeed = 0;
+  }
+  else
+  {
+    leftspeed = 0;
+    rightspeed = 0;
+  }
+
+#ifdef DEBUG &&WHEEL_DEBUG
+  Serial.print("Left speed: ");
+  Serial.print(leftspeed);
+  Serial.print("\t");
+  Serial.print("right_speed ");
+  Serial.print(rightspeed);
+  Serial.println("");
+#endif
+  move(left, leftspeed);
+  move(right, rightspeed);
 }

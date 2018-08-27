@@ -2,12 +2,19 @@
 #include "L298.h"
 #include <SBUS.h>
 // Macro debug def
-#define ARM_DEBUG
 
-#define DEBUG 2
+#define ARM_DEBUG
+#define WHEEL_DEBUG
+#define DEBUG
+
+
+
 #define AUTO 0
 #define MANUAL 1
 #define MANUAL_IK 2
+
+#define RC_SENSITIVITY_THRESHOLD 40
+#define RC_CHANNEL_FLAG 9
 
 #define BASE 0
 #define ACT1 1
@@ -17,6 +24,7 @@
 #define WRIST 5
 #define GRABBER 6
 #define FOWARD_BACKWARD 7
+#define LEFT_RITGHT 8
 #define LEFT_RITGHT 8
 
 // 12 v realy pins
@@ -32,12 +40,13 @@
 #define RELAY_24V_CH4 29
 //8 channel receiver
 int ch[8];
-// 12 volts
+
 IBT base(12, 13);       // wiper on base
 IBT act1wrist360(6, 7); // actuator1 and wrist360
 IBT act2(2, 3);         // actuator2
 IBT rpg(4, 5);          // roll pitch grabber in a single relay
-
+IBT left(11,11);
+IBT right(11,11);
 // for parsing serial data -- autonomous mode
 String IncomingData = "";
 String Temp = "";

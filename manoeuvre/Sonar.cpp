@@ -17,6 +17,6 @@ int Sonar::get_distance()
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH,4000);
   distance = (duration / 2) / 29.1;
-  // Serial.print(duration);
+  
   return duration;
 }
