@@ -1,13 +1,9 @@
 #include "IBT.h"
-#include "L298.h"
 #include <SBUS.h>
 // Macro debug def
-
 #define ARM_DEBUG
 #define WHEEL_DEBUG
 #define DEBUG
-
-
 
 #define AUTO 0
 #define MANUAL 1
@@ -38,40 +34,30 @@
 #define RELAY_24V_CH2 25
 #define RELAY_24V_CH3 27
 #define RELAY_24V_CH4 29
+
 //8 channel receiver
 int ch[8];
 
-IBT base(12, 13);       // wiper on base
-IBT act1wrist360(6, 7); // actuator1 and wrist360
-IBT act2(2, 3);         // actuator2
-IBT rpg(4, 5);          // roll pitch grabber in a single relay
-IBT left(11,11);
-IBT right(11,11);
-// for parsing serial data -- autonomous mode
-String IncomingData = "";
-String Temp = "";
-char var;
-char dir;
-int num1, num2, num3;
-// present coordinates of end effector
-int x, y, z;
+IBT base(12, 13);         // wiper on base
+IBT act1wrist360(10, 11); // actuator1 and wrist360
+IBT act2(14, 15);         // actuator2
+IBT rpg(8, 9);            // roll pitch grabber in a single relay
+IBT left(12, 12);
+IBT right(12, 12);
 
 SBUS sbus(Serial3);
+int mode;                       // mannual auto semi_auto serial
+String inputString = "";        // a string to hold incoming data
+boolean stringComplete = false; // whether the string is complete
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(57600);
   sbus.begin(true);
+  // reserve 200 bytes for the inputString:
+  inputString.reserve(200);
   //receiver setup
-  for (int i = 0; i < 8; i++)
-  {
-    ch[i] = 39 + 2 * i;
-    pinMode(ch[i], INPUT);
-  }
   setup_relays();
-  x = 30;
-  y = 0;
-  z = -50;
 }
 
 ISR(TIMER2_COMPA_vect)
@@ -79,36 +65,86 @@ ISR(TIMER2_COMPA_vect)
   sbus.process();
 }
 
-int mode;
 void loop()
 {
-  //  mode = get_mode();
-  // mode = MANUAL;
-  // if (mode == AUTO)
-  // {
-  //   automate();
-  // }
-  // else {
-  //   handle_rf();
-  // }
   test();
 }
 
 void test()
 {
-  // int del = 1000;
-  // rpg.rotPos(150);
-  // delay(del);
-  // rpg.rotPos(0);
-  // delay(del);
-  // rpg.rotNeg(150);
-  // delay(del);
-  // rpg.rotNeg(0);
-  //  armtest();
-  only_rf_full();
+  // only_rf_full();
+  // only_serial_full();
   // reciever_test();
-  //  display_feedbacks();
+// print the string when a newline arrives:
+  if (stringComplete)
+  {
+    Serial.println(inputString);
+    handle_serial(inputString)
+    // clear the string:
+    inputString = "";
+    stringComplete = false;
+  }
+
 }
+
+
+/*
+  SerialEvent occurs whenever a new data comes in the
+ hardware serial RX.  This routine is run between each
+ time loop() runs, so using delay inside loop can delay
+ response.  Multiple bytes of data may be available.
+ */
+void serialEvent()
+{
+  while (Serial.available())
+  {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n')
+    {
+      stringComplete = true;
+    }
+  }
+}
+
+// void serialevent()
+// {
+//   if (Serial.available())
+//   {
+//    while (Serial.available())
+//     {
+//       var = Serial.read();
+//       if (var == '\n')
+//       {
+//         while (Serial.available())
+//           var = Serial.read();
+//         break;
+//       }
+//       IncomingData += String(var);
+//     }
+//     Serial.println(IncomingData);
+//     dir = (char)IncomingData[0];
+//     num1 = IncomingData.substring(0, 4).toInt();
+//     num2 = IncomingData.substring(4, 8).toInt();
+//     num3 = IncomingData.substring(8, 12).toInt();
+//     x = num1;
+//     y = num2;
+//     z = num3;
+//     Serial.print("x : ");
+//     Serial.print(x);
+//     Serial.print(" y : ");
+//     Serial.print(y);
+//     Serial.print(" z : ");
+//     Serial.println(z);
+//     while (Serial.available())
+//       var = Serial.read();
+//     IncomingData = "";
+//   }
+// }
 
 // void armtest()
 // {
@@ -145,62 +181,12 @@ void test()
 //   }
 // }
 
-void get_data_from_serial()
-{
-  if (Serial.available())
-  {
-    //    delayMicroseconds(10);
-    while (Serial.available())
-    {
-      var = Serial.read();
-      if (var == '\n')
-      {
-        while (Serial.available())
-          var = Serial.read();
-        break;
-      }
-      IncomingData += String(var);
-    }
-    Serial.println(IncomingData);
-    dir = (char)IncomingData[0];
-    num1 = IncomingData.substring(0, 4).toInt();
-    num2 = IncomingData.substring(4, 8).toInt();
-    num3 = IncomingData.substring(8, 12).toInt();
-    x = num1;
-    y = num2;
-    z = num3;
-    Serial.print("x : ");
-    Serial.print(x);
-    Serial.print(" y : ");
-    Serial.print(y);
-    Serial.print(" z : ");
-    Serial.println(z);
-    while (Serial.available())
-      var = Serial.read();
-    IncomingData = "";
-  }
-}
-
-double get_angle(int angle_num)
-{
-  double angle;
-  switch (angle_num)
-  {
-  case 1:
-    //get angle from the POT
-    angle = base_angle();
-    break;
-  case 2:
-    //get angle from the SONAR
-    break;
-  case 3:
-    //get angle from the SONAR
-    //return that
-    break;
-  case 4:
-    //get angle using C1 C2
-    //return that
-    break;
-  }
-  return angle;
-}
+//  mode = get_mode();
+// mode = MANUAL;
+// if (mode == AUTO)
+// {
+//   automate();
+// }
+// else {
+//   handle_rf();
+// }

@@ -107,19 +107,4 @@ void move(IBT arm, int pwm)
     arm.stop();
 }
 
-void move(L298 arm, int pwm)
-{
-  if (pwm < 0)
-  {
-    pwm = (-1) * pwm;
-    arm.rotNeg(pwm);
-  }
-  else if (pwm > 0)
-  {
-    arm.rotPos(pwm);
-  }
-  else
-    arm.stop();
-}
-
 
