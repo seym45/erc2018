@@ -171,12 +171,20 @@ def xyz2theta(xyz,roll_pitch_yaw):
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
     theta6 = atan2(-R3_6[1,1], R3_6[1,0]) 
-    theta1=round(float(theta1*180/(math.pi)),1)
-    theta2=round(float(theta2*180/(math.pi)),1)
-    theta3=round(float(theta3*180/(math.pi)),1)
-    theta4=round(float(theta4*180/(math.pi)),1)
-    theta5=round(float(theta5*180/(math.pi)),1)
-    theta6=round(float(theta6*180/(math.pi)),1)
+    try:
+        theta1=round(float(theta1*180/(math.pi)),1)
+        theta2=round(float(theta2*180/(math.pi)),1)
+        theta3=round(float(theta3*180/(math.pi)),1)
+        theta4=round(float(theta4*180/(math.pi)),1)
+        theta5=round(float(theta5*180/(math.pi)),1)
+        theta6=round(float(theta6*180/(math.pi)),1)
+    except TypeError as e:
+        print(str(e))
+        return None
+    except Exception as e:
+        print(str(e))
+        return None
+
     print (theta1)
     print (theta2)
     print (theta3)

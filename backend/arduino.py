@@ -19,11 +19,12 @@ class Arduino:
         self.connect()
     
     def getPort(self):
-        comlist = serial.tools.list_ports.comports()
-        print(comlist)
-        for comport, address in comlist:
-            if self.id in address:
-                self.port = comport
+        comlist = list(serial.tools.list_ports.comports())
+        for p in comlist:
+            if self.id in p.serial_number:
+                self.port = p.device
+        print(self.port)
+
 
     def connect(self):
         try:
@@ -49,6 +50,17 @@ class Arduino:
             print(str(e))
             self.connected = False
 
+# Drive
+# COM25 - USB Serial Device (COM25)
+# 85430343038351918152
+
+# Feedback
+# COM26 - USB Serial Device (COM26)
+# 95634313632351D0E152
 
 if __name__ == '__main__':
-    feedback = Arduino('123',96600)
+    feedback = Arduino('95634313632351D0E152',57600)
+    drive = Arduino('85430343038351918152',57600)
+    
+    
+        
