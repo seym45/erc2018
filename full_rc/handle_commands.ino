@@ -1,17 +1,21 @@
 // --------------------------------
 void handle_serial(String cmd)
 {
-  int speed;
-  for (int i = 0; i < 3; i++)
+  int speed = 130;
+  for (int i = 0; i < 2; i++)
   {
+    if ( 1 == i)speed = 250;
     Serial.print(cmd[i]);
     if (cmd[i] == '+')
-      speed = 200;
+    { 
+      if ( 0 == i) speed = 220;
+      speed = speed;
+    }
     else if (cmd[i] == '-')
-      speed = -200;
+      speed = -1 * speed;
     else
       speed = 0;
-    move_it(i, speed);
+    move_it(i + 1, speed);
   }
   Serial.println("---------");
 }
@@ -31,9 +35,10 @@ int available = 10;
 
 void only_rf_full()
 {
+
   if (get_pwm_input_from_rf(RC_CHANNEL_ENABLE) > 50)
   {
-    Serial.println("Off");
+    //Serial.println("Off");
     return;
   }
 
@@ -79,7 +84,7 @@ void driver_arms()
 
     if (speed && (name == 1 || name == 5)) // act wrst
     {
-      
+
       actwrst_id = name;
       actwrst_count++;
       actwrst_spd = speed;

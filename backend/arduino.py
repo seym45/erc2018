@@ -22,6 +22,7 @@ class Arduino:
         comlist = list(serial.tools.list_ports.comports())
         for p in comlist:
             if self.id in p.serial_number:
+                print(p.serial_number)
                 self.port = p.device
         print(self.port)
 
@@ -61,6 +62,9 @@ class Arduino:
 if __name__ == '__main__':
     feedback = Arduino('95634313632351D0E152',57600)
     drive = Arduino('85430343038351918152',57600)
-    
+    comlist = list(serial.tools.list_ports.comports())
+    for p in comlist:
+            print(p.serial_number)
+        
     
         
